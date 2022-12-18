@@ -14,35 +14,41 @@ function App() {
   const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
-    axios
-      .get("https://639cbc2942e3ad69273abfaa.mockapi.io/Items")
-      .then((res) => {
-        setItems(res.data);
-      });
-    axios
-      .get("https://639cbc2942e3ad69273abfaa.mockapi.io/cart")
-      .then((res) => {
-        setCartItems(res.data);
-      });
-    axios
-      .get("https://639cbc2942e3ad69273abfaa.mockapi.io/favorite")
-      .then((res) => {
-        setFavorite(res.data);
-      });
+    async function fetchData() {
+      const cartResponse = await axios.get(
+        "https://639cbc2942e3ad69273abfaa.mockapi.io/cart"
+      );
+      const favoritesResponse = await axios.get(
+        "https://639cbc2942e3ad69273abfaa.mockapi.io/favorite"
+      );
+      const itemsResponse = await axios.get(
+        "https://639cbc2942e3ad69273abfaa.mockapi.io/Items"
+      );
+      setCartItems(cartResponse.data);
+      setFavorite(favoritesResponse.data);
+      setItems(itemsResponse.data);
+    }
+
+    fetchData();
     // eslint-disable-next-line
   }, []);
 
-  const onRemoveItem = (id) => {
-    axios.delete(`https://639cbc2942e3ad69273abfaa.mockapi.io/cart/${id}`);
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  const handleSearch = (e) => {
+    setSearchValue(e.target.value);
   };
 
   const onAddToCart = (obj) => {
-    axios.post("https://639cbc2942e3ad69273abfaa.mockapi.io/cart", obj);
-    // const added = cartItems.find((item) => item.imgUrl === obj.imgUrl);
-    // if (!added) {
-    setCartItems((prev) => [...prev, obj]);
-    // }
+    if (cartItems.find((item) => Number(item.id) === Number(obj.id))) {
+      axios.delete(
+        `https://639cbc2942e3ad69273abfaa.mockapi.io/cart/${obj.id}`
+      );
+      setCartItems((prev) =>
+        prev.filter((item) => Number(item.id) !== Number(obj.id))
+      );
+    } else {
+      axios.post("https://639cbc2942e3ad69273abfaa.mockapi.io/cart", obj);
+      setCartItems((prev) => [...prev, obj]);
+    }
   };
 
   const onAddToFavorite = async (obj) => {
@@ -63,8 +69,9 @@ function App() {
     }
   };
 
-  const handleSearch = (e) => {
-    setSearchValue(e.target.value);
+  const onRemoveItem = (id) => {
+    axios.delete(`https://639cbc2942e3ad69273abfaa.mockapi.io/cart/${id}`);
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (
@@ -85,6 +92,7 @@ function App() {
           element={
             <Home
               items={items}
+              cartItems={cartItems}
               searchValue={searchValue}
               setSearchValue={setSearchValue}
               handleSearch={handleSearch}

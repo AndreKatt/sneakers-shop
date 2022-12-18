@@ -2,6 +2,7 @@ import { Card } from "../components/Card";
 
 export const Home = ({
   items,
+  cartItems,
   searchValue,
   setSearchValue,
   handleSearch,
@@ -43,6 +44,10 @@ export const Home = ({
                 key={idx}
                 onPlus={(obj) => onAddToCart(obj)}
                 onFavorite={(obj) => onAddToFavorite(obj)}
+                added={cartItems.some(
+                  (obj) => Number(obj.id) === Number(item.id)
+                )}
+                loading={true}
                 {...item}
               />
             );
