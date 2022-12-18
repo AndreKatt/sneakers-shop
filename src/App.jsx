@@ -1,12 +1,15 @@
-import { Card } from "./components/Card";
 import { Header } from "./components/Header";
 import { Drawer } from "./components/Drawer";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Route, Routes } from "react-router-dom";
+import { Home } from "./pages/Home";
+import { Favorites } from "./pages/Favorites";
 
 function App() {
   const [cartOpened, setCartOpened] = useState(false);
   const [items, setItems] = useState([]);
+  const [favorite, setFavorite] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [searchValue, setSearchValue] = useState("");
 
@@ -21,18 +24,17 @@ function App() {
       .then((res) => {
         setCartItems(res.data);
       });
+    axios
+      .get("https://639cbc2942e3ad69273abfaa.mockapi.io/favorite")
+      .then((res) => {
+        setFavorite(res.data);
+      });
     // eslint-disable-next-line
   }, []);
 
   const onRemoveItem = (id) => {
     axios.delete(`https://639cbc2942e3ad69273abfaa.mockapi.io/cart/${id}`);
     setCartItems((prev) => prev.filter((item) => item.id !== id));
-
-    // axios
-    //   .get("https://639cbc2942e3ad69273abfaa.mockapi.io/cart")
-    //   .then((res) => {
-    //     setCartItems(res.data);
-    //   });
   };
 
   const onAddToCart = (obj) => {
@@ -41,6 +43,24 @@ function App() {
     // if (!added) {
     setCartItems((prev) => [...prev, obj]);
     // }
+  };
+
+  const onAddToFavorite = async (obj) => {
+    try {
+      if (favorite.find((fav) => fav.id === obj.id)) {
+        axios.delete(
+          `https://639cbc2942e3ad69273abfaa.mockapi.io/favorite/${obj.id}`
+        );
+      } else {
+        const { data } = await axios.post(
+          "https://639cbc2942e3ad69273abfaa.mockapi.io/favorite",
+          obj
+        );
+        setFavorite((prev) => [...prev, data]);
+      }
+    } catch {
+      alert("Не удалось добавить в избранное");
+    }
   };
 
   const handleSearch = (e) => {
@@ -56,50 +76,31 @@ function App() {
           onRemove={onRemoveItem}
         />
       )}
-      <Header onClickCart={() => setCartOpened(true)} />
-      <div className="content p-40">
-        <div className="d-flex align-center justify-between mb-40">
-          <h1>
-            {searchValue
-              ? `Поиск по запросу: "${searchValue}"`
-              : "Все кроссовки"}
-          </h1>
-          <div className="search-block d-flex">
-            <img src="/img/search.svg" alt="Search" />
-            {searchValue && (
-              <img
-                onClick={() => setSearchValue("")}
-                className="clear cu-p"
-                src="/img/remove.svg"
-                alt="Remove"
-              />
-            )}
-            <input
-              onChange={handleSearch}
-              value={searchValue}
-              placeholder="Поиск..."
-            />
-          </div>
-        </div>
 
-        <div className="d-flex flex-wrap">
-          {items
-            .filter((item) =>
-              item.name.toLowerCase().includes(searchValue.toLowerCase())
-            )
-            .map((item) => {
-              return (
-                <Card
-                  key={item.key}
-                  name={item.name}
-                  price={item.price}
-                  imgUrl={item.imgUrl}
-                  onPlus={onAddToCart}
-                />
-              );
-            })}
-        </div>
-      </div>
+      <Header onClickCart={() => setCartOpened(true)} />
+      <Routes>
+        <Route
+          exact
+          path="/"
+          element={
+            <Home
+              items={items}
+              searchValue={searchValue}
+              setSearchValue={setSearchValue}
+              handleSearch={handleSearch}
+              onAddToCart={onAddToCart}
+              onAddToFavorite={onAddToFavorite}
+            />
+          }
+        />
+        <Route
+          exact
+          path="/favorites"
+          element={
+            <Favorites items={favorite} onAddToFavorite={onAddToFavorite} />
+          }
+        />
+      </Routes>
     </div>
   );
 }
