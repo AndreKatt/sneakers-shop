@@ -10,7 +10,7 @@ export const Drawer = ({ onCloseCart, onRemove, items = [] }) => {
             onClick={onCloseCart}
             className="cu-p "
             src="/img/remove.svg"
-            alt="Remove"
+            alt="Close"
           />
         </h2>
         {items.length > 0 ? (

@@ -24,8 +24,15 @@ function App() {
     // eslint-disable-next-line
   }, []);
 
-  const onRemove = (id) => {
+  const onRemoveItem = (id) => {
     axios.delete(`https://639cbc2942e3ad69273abfaa.mockapi.io/cart/${id}`);
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+
+    // axios
+    //   .get("https://639cbc2942e3ad69273abfaa.mockapi.io/cart")
+    //   .then((res) => {
+    //     setCartItems(res.data);
+    //   });
   };
 
   const onAddToCart = (obj) => {
@@ -46,7 +53,7 @@ function App() {
         <Drawer
           items={cartItems}
           onCloseCart={() => setCartOpened(false)}
-          onRemove={onRemove}
+          onRemove={onRemoveItem}
         />
       )}
       <Header onClickCart={() => setCartOpened(true)} />
