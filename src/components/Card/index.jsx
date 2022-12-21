@@ -16,13 +16,14 @@ export const Card = ({
 }) => {
   const { isItemAdded } = useContext(AppContext);
   const [isFavorite, setIsFavorite] = useState(liked);
+  const obj = { id, parentID: id, imgUrl, name, price };
 
   const onClickPlus = () => {
-    onPlus({ id, imgUrl, name, price });
+    onPlus(obj);
   };
 
   const onClickFavorite = () => {
-    onFavorite({ id, imgUrl, name, price });
+    onFavorite(obj);
     setIsFavorite(!isFavorite);
   };
 
@@ -45,12 +46,14 @@ export const Card = ({
         </ContentLoader>
       ) : (
         <>
-          <div onClick={onClickFavorite} className={styles.favorite}>
-            <img
-              src={isFavorite ? "/img/liked.svg" : "/img/like.svg"}
-              alt="Unliked"
-            />
-          </div>
+          {onFavorite && (
+            <div onClick={onClickFavorite} className={styles.favorite}>
+              <img
+                src={isFavorite ? "/img/liked.svg" : "/img/like.svg"}
+                alt="Unliked"
+              />
+            </div>
+          )}
           <img width={133} height={112} src={imgUrl} alt="Sneakers" />
           <h5>{name}</h5>
           <div className="d-flex justify-between align-center">
@@ -58,14 +61,16 @@ export const Card = ({
               <span>Цена:</span>
               <b>{price} руб.</b>
             </div>
-            <img
-              className={styles.buttImg}
-              width={32}
-              height={32}
-              onClick={onClickPlus}
-              src={isItemAdded(id) ? "/img/added.svg" : "/img/add.svg"}
-              alt="Plus"
-            />
+            {onPlus && (
+              <img
+                className={styles.buttImg}
+                width={32}
+                height={32}
+                onClick={onClickPlus}
+                src={isItemAdded(id) ? "/img/added.svg" : "/img/add.svg"}
+                alt="Plus"
+              />
+            )}
           </div>
         </>
       )}

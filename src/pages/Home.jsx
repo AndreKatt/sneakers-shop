@@ -14,17 +14,15 @@ export const Home = ({
       item.name.toLowerCase().includes(searchValue.toLowerCase())
     );
 
-    return (isLoading ? [...Array(10)] : filteredItems).map((item, idx) => {
-      return (
-        <Card
-          key={idx}
-          onPlus={(obj) => onAddToCart(obj)}
-          onFavorite={(obj) => onAddToFavorite(obj)}
-          loading={isLoading}
-          {...item}
-        />
-      );
-    });
+    return (isLoading ? [...Array(10)] : filteredItems).map((item, idx) => (
+      <Card
+        key={idx}
+        onPlus={(obj) => onAddToCart(obj)}
+        onFavorite={(obj) => onAddToFavorite(obj)}
+        loading={isLoading}
+        {...item}
+      />
+    ));
   };
 
   return (
